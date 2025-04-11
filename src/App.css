@@ -1,42 +1,67 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.navbar-brand {
+margin-left: 10px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.row {
+    width: 95%;
+    margin: auto;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.landing h1 {
+    font-size: 84px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.landing p {
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
-.card {
-  padding: 2em;
+.landing h1, .landing p {
+    margin-bottom: 20px;
 }
 
-.read-the-docs {
-  color: #888;
+button#get-tickets {
+    background: linear-gradient(to left, #181818, #333, #444);
+    color: white;
+    border: 1px solid rgb(255, 255, 255, 0.3);
+    padding: 18px 60px;
+    font-size: 18px;
+    border-radius: 15px;
+}
+
+.landing .card {
+    width: calc(50% - 5%); /* Subtract the padding from the width */
+    max-width: calc(50% - 5%);
+}
+
+.landing {
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.card-form {
+    width: 80%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-form select {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    color: black;
+    font-size: 16px;
+    appearance: none; /* Remove default dropdown styling */
+    position: relative;
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    text-align: left;
 }
