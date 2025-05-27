@@ -21,7 +21,6 @@ export default function CardForm() {
                 </select>
             </form>
 
-
             <img 
               src="/seat-img.png" 
               alt="Seat Number" 
