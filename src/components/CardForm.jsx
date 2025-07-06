@@ -1,68 +1,115 @@
 import React, { useState } from 'react';
+import '../index.css';
 
 const teams = [
-  "Arizona Diamondbacks", "Atlanta Braves", "Baltimore Orioles", "Boston Red Sox", "Chicago White Sox",
-  "Chicago Cubs", "Cincinnati Reds", "Cleveland Guardians", "Colorado Rockies", "Detroit Tigers",
-  "Houston Astros", "Kansas City Royals", "Los Angeles Angels", "Los Angeles Dodgers", "Miami Marlins",
-  "Milwaukee Brewers", "Minnesota Twins", "New York Yankees", "New York Mets", "Oakland Athletics",
-  "Philadelphia Phillies", "Pittsburgh Pirates", "San Diego Padres", "San Francisco Giants",
-  "Seattle Mariners", "St. Louis Cardinals", "Tampa Bay Rays", "Texas Rangers", "Toronto Blue Jays", "Washington Nationals"
+    "San Diego Padres", "Los Angeles Dodgers", "San Francisco Giants", "Arizona Diamondbacks", "Colorado Rockies",
+    "Chicago Cubs", "St. Louis Cardinals", "Milwaukee Brewers", "Pittsburgh Pirates", "Cincinnati Reds",
+    "Atlanta Braves", "New York Mets", "Philadelphia Phillies", "Miami Marlins", "Washington Nationals",
+    "Houston Astros", "Texas Rangers", "Seattle Mariners", "Los Angeles Angels", "Oakland Athletics",
+    "New York Yankees", "Boston Red Sox", "Toronto Blue Jays", "Baltimore Orioles", "Tampa Bay Rays",
+    "Minnesota Twins", "Detroit Tigers", "Cleveland Guardians", "Kansas City Royals", "Chicago White Sox"
 ];
 
 const stadiums = [
-  "Angel Stadium", "Minute Maid Park", "Oakland Coliseum", "Rogers Centre",
-  "Truist Park", "American Family Field", "Busch Stadium", "Wrigley Field",
-  "Chase Field", "Dodger Stadium", "Oracle Park", "Progressive Field",
-  "T-Mobile Park", "loanDepot Park", "Citi Field", "Nationals Park",
-  "Camden Yards", "Petco Park", "Citizens Bank Park", "PNC Park",
-  "Globe Life Field", "Tropicana Field", "Fenway Park", "Great American Ball Park",
-  "Coors Field", "Kauffman Stadium", "Comerica Park", "Target Field",
-  "Guaranteed Rate Field", "Yankee Stadium"
+    "Petco Park", "Dodger Stadium", "Oracle Park", "Chase Field", "Coors Field",
+    "Wrigley Field", "Busch Stadium", "American Family Field", "PNC Park", "Great American Ball Park",
+    "Truist Park", "Citi Field", "Citizens Bank Park", "LoanDepot Park", "Nationals Park",
+    "Minute Maid Park", "Globe Life Field", "T-Mobile Park", "Angel Stadium", "Oakland Coliseum",
+    "Yankee Stadium", "Fenway Park", "Rogers Centre", "Camden Yards", "Tropicana Field",
+    "Target Field", "Comerica Park", "Progressive Field", "Kauffman Stadium", "Guaranteed Rate Field",
+    "Forbes Field" // legacy stadium used in demo
 ];
 
 export default function CardForm() {
-  const [team1, setTeam1] = useState('');
-  const [team2, setTeam2] = useState('');
-  const [venue, setVenue] = useState('');
+    const [team1, setTeam1] = useState('');
+    const [team2, setTeam2] = useState('');
+    const [venue, setVenue] = useState('');
+    const [imageUrl, setImageUrl] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  const teamConflict = team1 && team2 && team1 === team2;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        setImageUrl(null);
 
-  return (
-    <div className='card-form'>
-      <form>
-        <select name="team1" value={team1} onChange={(e) => setTeam1(e.target.value)}>
-          <option value="" disabled>Team 1</option>
-          {teams.map((team) => (
-            <option key={team} value={team}>{team}</option>
-          ))}
-        </select>
+        if (!team1 || !team2 || !venue) {
+            setError("Please select all fields.");
+            setLoading(false);
+            return;
+        }
 
-        <select name="team2" value={team2} onChange={(e) => setTeam2(e.target.value)}>
-          <option value="" disabled>Team 2</option>
-          {teams.map((team) => (
-            <option key={team} value={team}>{team}</option>
-          ))}
-        </select>
+        if (team1 === team2) {
+            setError("Teams must be different.");
+            setLoading(false);
+            return;
+        }
 
-        <select name="venue" value={venue} onChange={(e) => setVenue(e.target.value)}>
-          <option value="" disabled>Venue</option>
-          {stadiums.map((stadium) => (
-            <option key={stadium} value={stadium}>{stadium}</option>
-          ))}
-        </select>
+        const formData = new FormData();
+        formData.append("team1", team1);
+        formData.append("team2", team2);
+        formData.append("venue", venue);
 
-        {teamConflict && (
-          <p style={{ color: 'red', fontWeight: 'bold' }}>
-            ⚠️ Team 1 and Team 2 must be different!
-          </p>
-        )}
-      </form>
+        try {
+            const response = await fetch("http://localhost:8000/predict", {
+                method: "POST",
+                body: formData
+            });
 
-      <img 
-        src="/seat-img.png" 
-        alt="Seat Number" 
-        style={{ width: '95%', display: 'block', margin: '0 auto' }} 
-      />
-    </div>
-  );
+            if (!response.ok) {
+                const msg = await response.text();
+                throw new Error(msg || "Server error");
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            setImageUrl(url);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="card-form">
+            <form onSubmit={handleSubmit}>
+                <select value={team1} onChange={(e) => setTeam1(e.target.value)}>
+                    <option value="">Select Team 1</option>
+                    {teams.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                    ))}
+                </select>
+
+                <select value={team2} onChange={(e) => setTeam2(e.target.value)}>
+                    <option value="">Select Team 2</option>
+                    {teams.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                    ))}
+                </select>
+
+                <select value={venue} onChange={(e) => setVenue(e.target.value)}>
+                    <option value="">Select Stadium</option>
+                    {stadiums.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                    ))}
+                </select>
+
+                <button type="submit" disabled={loading}>
+                    {loading ? "Predicting..." : "Get Best Seat Zone"}
+                </button>
+            </form>
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+
+            {imageUrl && (
+                <img
+                    src={imageUrl}
+                    alt="Best Seat Zone"
+                    style={{ width: '95%', display: 'block', margin: '20px auto' }}
+                />
+            )}
+        </div>
+    );
 }

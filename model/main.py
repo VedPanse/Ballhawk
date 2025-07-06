@@ -10,6 +10,40 @@ import time
 from datetime import datetime, timedelta
 import sys
 
+TEAM_NAME_TO_ABBR = {
+    "Arizona Diamondbacks": "ARI",
+    "Atlanta Braves": "ATL",
+    "Baltimore Orioles": "BAL",
+    "Boston Red Sox": "BOS",
+    "Chicago White Sox": "CWS",
+    "Chicago Cubs": "CHC",
+    "Cincinnati Reds": "CIN",
+    "Cleveland Guardians": "CLE",
+    "Colorado Rockies": "COL",
+    "Detroit Tigers": "DET",
+    "Houston Astros": "HOU",
+    "Kansas City Royals": "KC",
+    "Los Angeles Angels": "LAA",
+    "Los Angeles Dodgers": "LAD",
+    "Miami Marlins": "MIA",
+    "Milwaukee Brewers": "MIL",
+    "Minnesota Twins": "MIN",
+    "New York Yankees": "NYY",
+    "New York Mets": "NYM",
+    "Oakland Athletics": "OAK",
+    "Philadelphia Phillies": "PHI",
+    "Pittsburgh Pirates": "PIT",
+    "San Diego Padres": "SD",
+    "San Francisco Giants": "SF",
+    "Seattle Mariners": "SEA",
+    "St. Louis Cardinals": "STL",
+    "Tampa Bay Rays": "TB",
+    "Texas Rangers": "TEX",
+    "Toronto Blue Jays": "TOR",
+    "Washington Nationals": "WSH"
+}
+
+
 def get_team_id_map():
     url = "https://statsapi.mlb.com/api/v1/teams?sportId=1"
     response = requests.get(url)
@@ -79,15 +113,30 @@ def get_team_home_runs(team_abbr, start=None, end=None):
         return pd.concat(all_hr_rows, ignore_index=True)
     return pd.DataFrame()
 
-
 def get_stadium_image_url(stadium_name):
     clean_name = stadium_name.replace(" ", "")
-    return f"http://www.andrewclem.com/Baseball/Diag/{clean_name}.gif"
+    url = f"http://www.andrewclem.com/Baseball/Diag/{clean_name}.gif"
+    print(f"[DEBUG] Generated stadium image URL: {url}")
+    return url
+
 
 def get_stadium_image(url):
+    print(f"[DEBUG] Attempting to download image from: {url}")
     response = requests.get(url)
-    img = Image.open(BytesIO(response.content)).convert('RGBA')
-    return np.array(img)
+
+    if response.status_code != 200:
+        print(f"[ERROR] Failed to fetch image. Status code: {response.status_code}")
+        raise ValueError(f"Could not retrieve image from {url}")
+
+    try:
+        img = Image.open(BytesIO(response.content)).convert('RGBA')
+        print("[DEBUG] Image successfully loaded and converted to RGBA.")
+        return np.array(img)
+    except Exception as e:
+        print(f"[ERROR] Failed to parse image from content at {url}")
+        raise ValueError(f"Error loading image from URL {url}: {e}")
+
+
 
 def is_seat_color(rgb):
     r, g, b = rgb[:3]
@@ -190,9 +239,15 @@ team2 = sys.argv[2]
 stadium = sys.argv[3]
 
 print(f"Fetching home run data for {team1}...")
-team1_hr = get_team_home_runs(team1)
+team1_abbr = TEAM_NAME_TO_ABBR.get(team1)
+team2_abbr = TEAM_NAME_TO_ABBR.get(team2)
+
+if not team1_abbr or not team2_abbr:
+    raise ValueError(f"Invalid full team names: {team1}, {team2}")
+
+team1_hr = get_team_home_runs(team1_abbr)
 print(f"Fetching home run data for {team2}...")
-team2_hr = get_team_home_runs(team2)
+team2_hr = get_team_home_runs(team2_abbr)
 
 team_home_runs = pd.concat([team1_hr, team2_hr], ignore_index=True)
 plot_home_runs_on_stadium(stadium, team_home_runs)

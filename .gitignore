@@ -23,6 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .venv
+stadium_cache/
+__pycache__
 
 # FAT32 Failures
 ._*
