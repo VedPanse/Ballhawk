@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 .venv
 output/
+images/
 __pycache__
 
 # FAT32 Failures
