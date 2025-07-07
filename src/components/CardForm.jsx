@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../index.css';
+import '../App.css';
 
 const teams = [
     "San Diego Padres", "Los Angeles Dodgers", "San Francisco Giants", "Arizona Diamondbacks", "Colorado Rockies",
@@ -96,7 +96,7 @@ export default function CardForm() {
                     ))}
                 </select>
 
-                <button type="submit" disabled={loading}>
+                <button type="submit" disabled={loading} id='get-tickets'>
                     {loading ? "Predicting..." : "Get Best Seat Zone"}
                 </button>
             </form>
