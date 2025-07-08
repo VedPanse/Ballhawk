@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .venv
-output/
 images/
 __pycache__
 
