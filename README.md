@@ -1,5 +1,5 @@
 # Ballhawk AI
-![[public/Ballhawk.png]]
+![Ballhawk Logo](public/Ballhawk.png)
 Ballhawk AI predicts the best seats in a baseball stadium to catch a home run, using historical player and stadium data. Built with Vite.
 
 # Data needed
